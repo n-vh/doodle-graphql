@@ -7,21 +7,18 @@ export const UserController = {
     const document = await UserModel.findOne(filter);
 
     if (!document) {
-      throw Error('User Not Found');
+      throw Error('USER_NOT_FOUND');
     }
 
-    return document.toObject();
+    return document;
   },
   createUser: async (user: User) => {
-    const document = await UserModel.findOne({ email: user.email });
+    const document = await UserModel.findOne({ username: user.username });
 
     if (document) {
-      throw new Error('User Already Exists');
+      throw new Error('USER_ALREADY_EXISTS');
     }
 
-    return await UserModel.create({
-      email: user.email,
-      password: user.password,
-    });
+    return await UserModel.create(user);
   },
 };

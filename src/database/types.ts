@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 export interface Event {
-  _id?: ObjectId;
+  id?: ObjectId;
   owner: User;
   title: string;
   date: Date;
@@ -10,7 +10,8 @@ export interface Event {
 }
 
 export interface User {
-  _id?: ObjectId;
-  password: string;
+  id?: ObjectId;
+  username: string;
   email: string;
+  password: string;
 }

@@ -1,7 +1,7 @@
 import type { Event, User } from '../database/types';
 import { ObjectId } from 'mongodb';
-import { EventModel } from '../database/models';
 import { GraphQLError } from 'graphql';
+import { EventModel } from '../database/models';
 
 export const EventController = {
   getEvents: async () => {
@@ -61,7 +61,7 @@ export const EventController = {
       { _id: id },
       {
         $addToSet: {
-          participants: user._id,
+          participants: user.id,
         },
       },
     );
@@ -81,7 +81,7 @@ export const EventController = {
       { _id: id },
       {
         $pull: {
-          participants: user._id,
+          participants: user.id,
         },
       },
     );

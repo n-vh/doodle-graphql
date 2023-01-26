@@ -4,6 +4,7 @@ import S from 'fluent-json-schema';
 
 type AuthRequestPayload = FastifyRequest<{
   Body: {
+    username: string;
     email: string;
     password: string;
   };
@@ -12,6 +13,7 @@ type AuthRequestPayload = FastifyRequest<{
 const AuthValidation = {
   schema: {
     body: S.object()
+      .prop('username', S.string().minLength(3).maxLength(25).required())
       .prop('email', S.string().format(S.FORMATS.EMAIL).required())
       .prop('password', S.string().required().minLength(3)),
   },
@@ -33,8 +35,8 @@ export const authRouter: FastifyPluginCallback = (app, opts, next) => {
 
   app.post('/signin', AuthValidation, async (req: AuthRequestPayload, rep) => {
     try {
-      const user = await UserController.getUser({ email: req.body.email });
-      const token = app.jwt.sign({ payload: user._id });
+      const user = await UserController.getUser({ username: req.body.username });
+      const token = app.jwt.sign({ payload: user.id });
 
       if (user.password !== req.body.password) {
         throw Error('INVALID_PASSWORD');
