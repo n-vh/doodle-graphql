@@ -1,21 +1,19 @@
-import type { IEvent, IUser } from '../database/models';
+import type { Event, User } from '../database/types';
 import { ObjectId } from 'mongodb';
 import { EventModel } from '../database/models';
 import { GraphQLError } from 'graphql';
 
-export namespace EventController {
-  export const events = async () => {
+export const EventController = {
+  getEvents: async () => {
     return await EventModel.find();
-  };
-
-  export const event = async (eventId: string) => {
-    return await EventModel.findById(new Object(eventId));
-  };
-
-  export const createEvent = async (event: Partial<IEvent>, owner: IUser) => {
+  },
+  getEvent: async (id: ObjectId) => {
+    return await EventModel.findById(id);
+  },
+  createEvent: async (user: User, event: Partial<Event>) => {
     const document = await EventModel.findOne({
       date: new Date(event.date),
-      owner: owner,
+      owner: user,
     });
 
     if (document) {
@@ -25,28 +23,19 @@ export namespace EventController {
     return EventModel.create({
       date: new Date(event.date),
       description: event.description,
-      owner: owner,
-      participants: [owner],
+      owner: user,
+      participants: [user],
       title: event.title,
     });
-  };
-
-  export const editEvent = async (
-    eventId: string,
-    user: IUser,
-    event: Partial<IEvent>,
-  ) => {
+  },
+  editEvent: async (user: User, id: ObjectId, event: Partial<Event>) => {
     const document = await EventModel.findOneAndUpdate(
       {
-        _id: new ObjectId(eventId),
+        _id: id,
         owner: user,
       },
-      {
-        $set: event,
-      },
-      {
-        new: true,
-      },
+      { $set: event },
+      { new: true },
     );
 
     if (!document) {
@@ -54,12 +43,11 @@ export namespace EventController {
     }
 
     return document;
-  };
-
-  export const deleteEvent = async (id: string, owner: IUser) => {
+  },
+  deleteEvent: async (user: User, id: ObjectId) => {
     const document = await EventModel.findOneAndDelete({
-      _id: new ObjectId(id),
-      owner: owner,
+      _id: id,
+      owner: user,
     });
 
     if (!document) {
@@ -67,14 +55,13 @@ export namespace EventController {
     }
 
     return document;
-  };
-
-  export const joinEvent = async (eventId: string, userId: ObjectId) => {
+  },
+  joinEvent: async (user: User, id: ObjectId) => {
     const document = await EventModel.updateOne(
-      { _id: new ObjectId(eventId) },
+      { _id: id },
       {
         $addToSet: {
-          participants: userId,
+          participants: user._id,
         },
       },
     );
@@ -87,15 +74,14 @@ export namespace EventController {
       throw new GraphQLError('EVENT_ALREADY_JOINED');
     }
 
-    return await EventModel.findById(new ObjectId(eventId));
-  };
-
-  export const leaveEvent = async (eventId: string, userId: ObjectId) => {
+    return await EventModel.findById(id);
+  },
+  leaveEvent: async (user: User, id: ObjectId) => {
     const document = await EventModel.updateOne(
-      { _id: new ObjectId(eventId) },
+      { _id: id },
       {
         $pull: {
-          participants: userId,
+          participants: user._id,
         },
       },
     );
@@ -108,6 +94,6 @@ export namespace EventController {
       throw new GraphQLError('EVENT_NOT_JOINED');
     }
 
-    return await EventModel.findById(new ObjectId(eventId));
-  };
-}
+    return await EventModel.findById(id);
+  },
+};

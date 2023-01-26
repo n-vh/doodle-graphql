@@ -1,13 +1,7 @@
-import type { ObjectId } from 'mongodb';
+import type { User } from '../types';
 import { model, Schema } from 'mongoose';
 
-export interface IUser {
-  _id?: ObjectId;
-  password: string;
-  email: string;
-}
-
-const schema = new Schema<IUser>(
+const schema = new Schema<User>(
   {
     password: {
       type: String,
@@ -24,4 +18,4 @@ const schema = new Schema<IUser>(
   },
 );
 
-export const UserModel = model<IUser>('User', schema);
+export const UserModel = model<User>('User', schema);

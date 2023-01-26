@@ -2,7 +2,7 @@ import type { FastifyPluginCallback, FastifyRequest } from 'fastify';
 import { UserController } from '../controllers';
 import S from 'fluent-json-schema';
 
-type PostAuthRequest = FastifyRequest<{
+type AuthRequestPayload = FastifyRequest<{
   Body: {
     email: string;
     password: string;
@@ -18,12 +18,10 @@ const AuthValidation = {
 };
 
 export const authRouter: FastifyPluginCallback = (app, opts, next) => {
-  // sign up route
-  app.post('/signup', AuthValidation, async (req: PostAuthRequest, rep) => {
+  app.post('/signup', AuthValidation, async (req: AuthRequestPayload, rep) => {
     try {
       const user = await UserController.createUser(req.body);
       const token = app.jwt.sign({ payload: user._id });
-
       rep.send({ token });
     } catch (e) {
       rep.status(401).send({
@@ -33,16 +31,14 @@ export const authRouter: FastifyPluginCallback = (app, opts, next) => {
     }
   });
 
-  // sign in route
-  app.post('/signin', AuthValidation, async (req: PostAuthRequest, rep) => {
+  app.post('/signin', AuthValidation, async (req: AuthRequestPayload, rep) => {
     try {
       const user = await UserController.getUser({ email: req.body.email });
+      const token = app.jwt.sign({ payload: user._id });
 
       if (user.password !== req.body.password) {
-        throw Error('Wrong Password');
+        throw Error('INVALID_PASSWORD');
       }
-
-      const token = app.jwt.sign({ payload: user._id });
 
       rep.send({ token });
     } catch (e) {

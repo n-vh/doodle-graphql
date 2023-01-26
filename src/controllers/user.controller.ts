@@ -1,9 +1,9 @@
 import type { FilterQuery } from 'mongoose';
-import type { IUser } from '../database/models/user.model';
+import type { User } from '../database/types';
 import { UserModel } from '../database/models';
 
-export namespace UserController {
-  export const getUser = async (filter: FilterQuery<IUser>) => {
+export const UserController = {
+  getUser: async (filter: FilterQuery<User>) => {
     const document = await UserModel.findOne(filter);
 
     if (!document) {
@@ -11,9 +11,8 @@ export namespace UserController {
     }
 
     return document.toObject();
-  };
-
-  export const createUser = async (user: IUser) => {
+  },
+  createUser: async (user: User) => {
     const document = await UserModel.findOne({ email: user.email });
 
     if (document) {
@@ -24,5 +23,5 @@ export namespace UserController {
       email: user.email,
       password: user.password,
     });
-  };
-}
+  },
+};

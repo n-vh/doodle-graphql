@@ -1,17 +1,19 @@
-import { IEvent, IUser } from '../database/models';
-export { AuthContext } from './context';
-export { typeDefs } from './typedefs';
-export { GraphQLObjectID } from './scalars';
-export { mutationResolver, queryResolver } from './resolvers';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import {
+  constraintDirective,
+  constraintDirectiveTypeDefs,
+} from 'graphql-constraint-directive';
+import { mutationResolver, queryResolver } from './resolvers';
+import { GraphQLObjectID } from './scalars';
+import { typeDefinitions } from './typedefs';
 
-export type WithId = {
-  id: string;
-};
-
-export type WithEvent = {
-  input: IEvent;
-};
-
-export type WithUser = {
-  user: IUser;
-};
+export const serverSchema = constraintDirective()(
+  makeExecutableSchema({
+    typeDefs: [constraintDirectiveTypeDefs, typeDefinitions],
+    resolvers: {
+      ObjectID: GraphQLObjectID,
+      Query: queryResolver,
+      Mutation: mutationResolver,
+    },
+  }),
+);

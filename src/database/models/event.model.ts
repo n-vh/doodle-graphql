@@ -1,16 +1,7 @@
-import type { IUser } from './user.model';
-import { model, ObjectId, Schema } from 'mongoose';
+import type { Event } from '../types';
+import { model, Schema } from 'mongoose';
 
-export interface IEvent {
-  _id?: ObjectId;
-  owner: IUser;
-  title: string;
-  date: Date;
-  description: string;
-  participants: IUser[];
-}
-
-const schema = new Schema<IEvent>(
+const schema = new Schema<Event>(
   {
     owner: {
       type: Schema.Types.ObjectId,
@@ -43,4 +34,4 @@ schema.virtual('id').get((e) => {
   return e?._id;
 });
 
-export const EventModel = model<IEvent>('Event', schema);
+export const EventModel = model<Event>('Event', schema);

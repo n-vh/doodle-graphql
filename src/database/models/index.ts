@@ -1,2 +1,2 @@
-export { EventModel, IEvent } from './event.model';
-export { UserModel, IUser } from './user.model';
+export { EventModel } from './event.model';
+export { UserModel } from './user.model';

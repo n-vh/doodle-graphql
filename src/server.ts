@@ -3,39 +3,17 @@ import { fastifyApolloDrainPlugin, fastifyApolloHandler } from '@as-integrations
 import jwt from '@fastify/jwt';
 import cors from '@fastify/cors';
 import { fastify } from 'fastify';
-import {
-  constraintDirective,
-  constraintDirectiveTypeDefs,
-} from 'graphql-constraint-directive';
 import { ApolloServer } from '@apollo/server';
-import { makeExecutableSchema } from '@graphql-tools/schema';
-import {
-  AuthContext,
-  GraphQLObjectID,
-  mutationResolver,
-  queryResolver,
-  typeDefs,
-} from './graphql';
 import { Database } from './database';
 import { authRouter } from './router/auth.router';
+import { serverSchema } from './graphql';
+import { AuthContext } from './graphql/context';
 
 const initServer = async (opts?: FastifyServerOptions) => {
   const app = fastify(opts);
 
-  const schema = constraintDirective()(
-    makeExecutableSchema({
-      typeDefs: [constraintDirectiveTypeDefs, typeDefs],
-      resolvers: {
-        ObjectID: GraphQLObjectID,
-        Query: queryResolver,
-        Mutation: mutationResolver,
-      },
-    }),
-  );
-
   const apollo = new ApolloServer({
-    schema,
-    introspection: import.meta.env.DEV,
+    schema: serverSchema,
     includeStacktraceInErrorResponses: import.meta.env.DEV,
     plugins: [fastifyApolloDrainPlugin(app)],
   });
@@ -53,23 +31,23 @@ const initServer = async (opts?: FastifyServerOptions) => {
 
   app.register(authRouter);
 
-  app.post(
-    '/graphql',
-    fastifyApolloHandler(apollo, {
+  app.route({
+    url: '/graphql',
+    method: ['POST', 'OPTIONS', 'GET'],
+    handler: fastifyApolloHandler(apollo, {
       context: AuthContext,
     }),
-  );
+  });
 
   if (import.meta.env.PROD) {
     try {
-      app.listen({ port: 6543 });
-      console.log('Listening on port', 6543);
+      const PORT = import.meta.env.VITE_SERVER_PORT;
+      app.listen({ port: PORT });
+      console.log('Listening on port', PORT);
     } catch (e) {
       console.error(e);
       process.exit(1);
     }
-  } else {
-    app.get('/api', fastifyApolloHandler(apollo));
   }
 
   return app;

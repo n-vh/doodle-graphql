@@ -1,29 +1,29 @@
-import { WithEvent, WithId, WithUser } from './index';
+import type { WithEvent, WithId, WithUser } from './types';
 import { EventController } from '../controllers';
 
 export const queryResolver = {
   events: () => {
-    return EventController.events();
+    return EventController.getEvents();
   },
-  event: async (_, variables: WithId) => {
-    return EventController.event(variables.id);
+  event: (_, v: WithId) => {
+    EventController.getEvent(v.id);
   },
 };
 
 export const mutationResolver = {
-  createEvent: (_, variables: WithEvent, ctx: WithUser) => {
-    return EventController.createEvent(variables.input, ctx.user);
+  createEvent: (_, v: WithEvent, c: WithUser) => {
+    return EventController.createEvent(c.user, v.input);
   },
-  editEvent: (_, variables: WithId & WithEvent, ctx: WithUser) => {
-    return EventController.editEvent(variables.id, ctx.user, variables.input);
+  editEvent: (_, v: WithId & WithEvent, c: WithUser) => {
+    return EventController.editEvent(c.user, v.id, v.input);
   },
-  deleteEvent: (_, variables: WithId, ctx: WithUser) => {
-    return EventController.deleteEvent(variables.id, ctx.user);
+  deleteEvent: (_, v: WithId, c: WithUser) => {
+    return EventController.deleteEvent(c.user, v.id);
   },
-  joinEvent: (_, variables: WithId, ctx: WithUser) => {
-    return EventController.joinEvent(variables.id, ctx.user._id);
+  joinEvent: (_, v: WithId, c: WithUser) => {
+    return EventController.joinEvent(c.user, v.id);
   },
-  leaveEvent: (_, variables: WithId, ctx: WithUser) => {
-    return EventController.leaveEvent(variables.id, ctx.user._id);
+  leaveEvent: (_, v: WithId, c: WithUser) => {
+    return EventController.leaveEvent(c.user, v.id);
   },
 };

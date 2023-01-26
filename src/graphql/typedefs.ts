@@ -1,4 +1,4 @@
-export const typeDefs = `#graphql
+export const typeDefinitions = `#graphql
 scalar ObjectID
 
 type Event {
