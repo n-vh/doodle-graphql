@@ -13,7 +13,7 @@ export const EventController = {
   createEvent: async (user: User, event: Partial<Event>) => {
     const document = await EventModel.findOne({
       date: new Date(event.date),
-      owner: user,
+      owner: user.id,
     });
 
     if (document) {
@@ -23,8 +23,8 @@ export const EventController = {
     return EventModel.create({
       date: new Date(event.date),
       description: event.description,
-      owner: user,
-      participants: [user],
+      owner: user.id,
+      participants: [user.id],
       title: event.title,
     });
   },
@@ -32,7 +32,7 @@ export const EventController = {
     const document = await EventModel.findOneAndUpdate(
       {
         _id: id,
-        owner: user,
+        owner: user.id,
       },
       { $set: event },
       { new: true },
@@ -47,7 +47,7 @@ export const EventController = {
   deleteEvent: async (user: User, id: ObjectId) => {
     const document = await EventModel.findOneAndDelete({
       _id: id,
-      owner: user,
+      owner: user.id,
     });
 
     if (!document) {

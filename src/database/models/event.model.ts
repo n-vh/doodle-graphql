@@ -5,7 +5,7 @@ const schema = new Schema<Event>(
   {
     owner: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      required: true,
     },
     title: {
       type: String,
@@ -21,7 +21,6 @@ const schema = new Schema<Event>(
     participants: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'User',
       },
     ],
   },

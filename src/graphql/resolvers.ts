@@ -6,7 +6,7 @@ export const queryResolver = {
     return EventController.getEvents();
   },
   event: (_, v: WithId) => {
-    EventController.getEvent(v.id);
+    return EventController.getEvent(v.id);
   },
 };
 
